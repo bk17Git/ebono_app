@@ -1,0 +1,6 @@
+{
+  "name": "Ebono",
+  "description": "An all-in-one literary platform with an integrated e-reader, audiobooks player, bookstore, community forums, reading streaks, focus mode, and offline sync.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
