@@ -19,6 +19,84 @@ object GeminiService {
         .readTimeout(30, TimeUnit.SECONDS)
         .build()
 
+    suspend fun callGeminiChat(
+        modelName: String,
+        messages: List<Pair<String, String>>, // Pair(role, text) where role is "user" or "model"
+        systemInstruction: String? = null,
+        enableSearchGrounding: Boolean = false
+    ): String = withContext(Dispatchers.IO) {
+        val apiKey = BuildConfig.GEMINI_API_KEY
+        if (apiKey.isEmpty() || apiKey == "MY_GEMINI_API_KEY") {
+            return@withContext "API key not configured in AI Studio Secrets. Please configure GEMINI_API_KEY."
+        }
+
+        val url = "https://generativelanguage.googleapis.com/v1beta/models/$modelName:generateContent?key=$apiKey"
+
+        try {
+            val requestJson = JSONObject()
+
+            // 1. Contents (the conversation history)
+            val contentsArray = JSONArray()
+            for (msg in messages) {
+                contentsArray.put(JSONObject().apply {
+                    put("role", msg.first)
+                    put("parts", JSONArray().apply {
+                        put(JSONObject().apply {
+                            put("text", msg.second)
+                        })
+                    })
+                })
+            }
+            requestJson.put("contents", contentsArray)
+
+            // 2. System Instruction
+            if (!systemInstruction.isNullOrBlank()) {
+                requestJson.put("systemInstruction", JSONObject().apply {
+                    put("parts", JSONArray().apply {
+                        put(JSONObject().apply {
+                            put("text", systemInstruction)
+                        })
+                    })
+                })
+            }
+
+            // 3. Search Grounding Tool
+            if (enableSearchGrounding) {
+                requestJson.put("tools", JSONArray().apply {
+                    put(JSONObject().apply {
+                        put("googleSearch", JSONObject())
+                    })
+                })
+            }
+
+            val mediaType = "application/json; charset=utf-8".toMediaType()
+            val requestBody = requestJson.toString().toRequestBody(mediaType)
+            val request = Request.Builder()
+                .url(url)
+                .post(requestBody)
+                .build()
+
+            val response = client.newCall(request).execute()
+            val responseBody = response.body?.string() ?: ""
+            if (response.isSuccessful && responseBody.isNotEmpty()) {
+                val jsonResponse = JSONObject(responseBody)
+                val candidates = jsonResponse.optJSONArray("candidates")
+                if (candidates != null && candidates.length() > 0) {
+                    val content = candidates.getJSONObject(0).optJSONObject("content")
+                    val parts = content?.optJSONArray("parts")
+                    if (parts != null && parts.length() > 0) {
+                        return@withContext parts.getJSONObject(0).optString("text", "No response text")
+                    }
+                }
+            }
+            Log.e(TAG, "Gemini API failed: ${response.code}, body: $responseBody")
+            return@withContext "Error: Failed to fetch response from Gemini. Code ${response.code}"
+        } catch (e: Exception) {
+            Log.e(TAG, "Error in callGeminiChat", e)
+            return@withContext "Error: ${e.localizedMessage ?: "Unknown exception"}"
+        }
+    }
+
     suspend fun getBookRecommendation(
         readingHistory: List<String>,
         favoriteCategories: List<String>,

@@ -52,7 +52,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MyApplicationTheme {
+            val settingsState by viewModel.userSettings.collectAsState()
+            val isDarkMode = settingsState?.isDarkMode ?: false
+            MyApplicationTheme(darkTheme = isDarkMode) {
                 MainAppScreen(viewModel)
             }
         }
@@ -299,6 +301,9 @@ fun MainAppScreen(viewModel: BookViewModel) {
                             launchSingleTop = true
                             restoreState = true
                         }
+                    },
+                    onNavigateToAiChat = {
+                        navController.navigate("aichat")
                     }
                 )
             }
@@ -357,6 +362,14 @@ fun MainAppScreen(viewModel: BookViewModel) {
             // nested 7: Full-screen Audiobook Player
             composable("audioplayer") {
                 AudioPlayerScreen(
+                    viewModel = viewModel,
+                    onNavigateBack = { navController.popBackStack() }
+                )
+            }
+
+            // nested 8: Ebono AI Assistant
+            composable("aichat") {
+                AiChatScreen(
                     viewModel = viewModel,
                     onNavigateBack = { navController.popBackStack() }
                 )

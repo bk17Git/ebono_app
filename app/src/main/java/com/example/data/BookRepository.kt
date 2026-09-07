@@ -189,6 +189,11 @@ class BookRepository(private val bookDao: BookDao) {
         bookDao.insertUserSettings(current.copy(isCloudBackupEnabled = !current.isCloudBackupEnabled))
     }
 
+    suspend fun toggleDarkMode() {
+        val current = bookDao.getUserSettings() ?: UserSettings()
+        bookDao.insertUserSettings(current.copy(isDarkMode = !current.isDarkMode))
+    }
+
     suspend fun triggerSyncProgress() {
         val current = bookDao.getUserSettings() ?: UserSettings()
         val books = bookDao.getAllBooks().firstOrNull() ?: emptyList()

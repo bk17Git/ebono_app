@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
         ReadingSession::class,
         UserSettings::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 abstract class BookDatabase : RoomDatabase() {

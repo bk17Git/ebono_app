@@ -48,7 +48,8 @@ fun HomeScreen(
     onNavigateToAudioPlayer: () -> Unit,
     onNavigateToLibrary: () -> Unit,
     onNavigateToFocus: () -> Unit,
-    onNavigateToAccount: () -> Unit
+    onNavigateToAccount: () -> Unit,
+    onNavigateToAiChat: () -> Unit = {}
 ) {
     val books by viewModel.allBooks.collectAsState()
     val settingsState by viewModel.userSettings.collectAsState()
@@ -105,19 +106,12 @@ fun HomeScreen(
                             Column {
                                 Text(
                                     text = "EBONO",
-                                    style = MaterialTheme.typography.labelSmall,
+                                    style = MaterialTheme.typography.headlineLarge,
                                     color = MaterialTheme.colorScheme.primary,
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.5.sp
+                                    fontWeight = FontWeight.ExtraBold,
+                                    letterSpacing = 3.sp
                                 )
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(
-                                    text = "Good Evening",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(10.dp))
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
                                     modifier = Modifier
@@ -148,6 +142,22 @@ fun HomeScreen(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
+                                // Theme Toggle shortcut button
+                                IconButton(
+                                    onClick = { viewModel.toggleDarkMode() },
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), CircleShape)
+                                        .testTag("home_theme_toggle_button")
+                                ) {
+                                    Icon(
+                                        imageVector = if (settings.isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
+                                        contentDescription = "Toggle Light/Dark Theme",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+
                                 // Focus Sanctum shortcut button
                                 IconButton(
                                     onClick = onNavigateToFocus,
@@ -159,6 +169,22 @@ fun HomeScreen(
                                     Icon(
                                         imageVector = Icons.Default.HourglassEmpty,
                                         contentDescription = "Focus Sanctum",
+                                        tint = MaterialTheme.colorScheme.primary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+
+                                // AI Chatbot shortcut button
+                                IconButton(
+                                    onClick = onNavigateToAiChat,
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), CircleShape)
+                                        .testTag("home_aichat_shortcut_button")
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Psychology,
+                                        contentDescription = "AI Assistant Chat",
                                         tint = MaterialTheme.colorScheme.primary,
                                         modifier = Modifier.size(20.dp)
                                     )
@@ -408,93 +434,7 @@ fun HomeScreen(
             }
         }
 
-        // Focus Sanctum Highlight Card
-        item {
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)),
-                elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.linearGradient(
-                                colors = listOf(
-                                    MaterialTheme.colorScheme.surface,
-                                    MaterialTheme.colorScheme.secondary.copy(alpha = 0.08f)
-                                )
-                            )
-                        )
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.08f), CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.HourglassEmpty,
-                                contentDescription = "Focus Mode",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
 
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Focus Sanctum",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onSurface
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Enter a distraction-free space with custom ambient sounds to help you read with absolute flow and zero interruptions.",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                lineHeight = 18.sp
-                            )
-                            Spacer(modifier = Modifier.height(14.dp))
-                            Button(
-                                onClick = onNavigateToFocus,
-                                modifier = Modifier.testTag("enter_focus_sanctum_button"),
-                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                                shape = RoundedCornerShape(24.dp),
-                                contentPadding = PaddingValues(horizontal = 20.dp, vertical = 10.dp)
-                            ) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.PlayArrow,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(16.dp)
-                                    )
-                                    Text(
-                                        text = "Start Focus Session",
-                                        style = MaterialTheme.typography.labelMedium,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
 
         // 4. Personalized AI Recommendation Engine Panel
         item {
@@ -637,6 +577,8 @@ fun HomeScreen(
                                 }
                             }
                         }
+
+
                     }
                 }
             }
@@ -1098,6 +1040,60 @@ fun AccountHubContent(
         }
 
         HorizontalDivider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f))
+
+        // Global Comfort Theme Toggle Card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            ),
+            shape = RoundedCornerShape(16.dp),
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.15f))
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    Icon(
+                        imageVector = if (settings.isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
+                        contentDescription = "Theme Icon",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Column {
+                        Text(
+                            text = "Comfort Theme",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Text(
+                            text = if (settings.isDarkMode) "Dark HUD Active" else "Light Mode Active",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                Switch(
+                    checked = settings.isDarkMode,
+                    onCheckedChange = { viewModel.toggleDarkMode() },
+                    modifier = Modifier.testTag("theme_toggle_switch"),
+                    thumbContent = {
+                        Icon(
+                            imageVector = if (settings.isDarkMode) Icons.Default.DarkMode else Icons.Default.LightMode,
+                            contentDescription = null,
+                            modifier = Modifier.size(SwitchDefaults.IconSize)
+                        )
+                    }
+                )
+            }
+        }
 
         if (settings.isLoggedIn) {
             // Profile Info View

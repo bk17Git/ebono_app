@@ -76,5 +76,6 @@ data class UserSettings(
     val username: String = "Guest Reader",
     val email: String = "",
     val userId: String = "",
-    val isFirebaseSynced: Boolean = false
+    val isFirebaseSynced: Boolean = false,
+    val isDarkMode: Boolean = false
 )

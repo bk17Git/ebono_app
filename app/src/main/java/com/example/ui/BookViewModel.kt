@@ -375,6 +375,12 @@ class BookViewModel(
         }
     }
 
+    fun toggleDarkMode() {
+        viewModelScope.launch {
+            repository.toggleDarkMode()
+        }
+    }
+
     fun triggerSync() {
         viewModelScope.launch {
             repository.triggerSyncProgress()
